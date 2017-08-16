@@ -84,7 +84,7 @@ invisible(sapply(SEAK16objects, function(objct) {assign(x = unlist(strsplit(x = 
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#### Resummarize 2016 Stratified Estimates to Driver Stock RGs ####
+#### Resummarize 2016 Comm Troll Stratified Estimates to Driver Stock RGs ####
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Define RGs
@@ -157,6 +157,7 @@ objects2dput <- c("EWintTroll2016_8RG_EstimatesStats",
                   "LWintTroll2016_8RG_EstimatesStats", 
                   "SpringTroll2016_8RG_EstimatesStats", 
                   "SumRet1Troll2016_8RG_EstimatesStats",
+                  "SumRet2Troll2016_8RG_EstimatesStats",
                   "TrollByQuad2016_8RG_EstimatesStats")
 
 invisible(sapply(objects2dput, function(obj) {
@@ -220,11 +221,11 @@ objects2dput <- c("EWintTroll2016_8RG_StratifiedEstimatesStats",
                   "LWintTroll2016_8RG_StratifiedEstimatesStats", 
                   "SpringTroll2016_8RG_StratifiedEstimatesStats", 
                   "SumRet1Troll2016_8RG_StratifiedEstimatesStats",
-                  "SumRet1Troll2016_8RG_StratifiedEstimatesStats", 
+                  "SumRet2Troll2016_8RG_StratifiedEstimatesStats", 
                   "AllYearTroll2016_8RG_StratifiedEstimatesStats")
 
 invisible(sapply(objects2dput, function(obj) {
-  dput(x = get(obj), file = paste0("Estimates objects/", obj, ".txt"))
+  dput(x = get(obj)$Stats, file = paste0("Estimates objects/", obj, ".txt"))
 })); rm(objects2dput)
 
 
@@ -278,6 +279,7 @@ Troll2016PubNames <- setNames(object = c("Northern Outside Quadrant",
                                          "Northern Outside Quadrant",
                                          "All Quadrants"), 
                               nm = names(Troll2016_8RG_EstimatesStats_Formatted))
+dput(x = Troll2016PubNames, file = "Objects/Troll2016PubNames.txt")
 
 SEAK2016Mixtures <- list.files(path = "BAYES/Mixture", full.names = FALSE)
 SEAK2016Mixtures_SampSizes <- sapply(SEAK2016Mixtures, function(mix) {dim(read.table(file = paste0("BAYES/Mixture/", mix)))[1]} )
@@ -295,6 +297,7 @@ Troll2016MixNames <- setNames(object = list("EWintNO_2016",
                                             "Summer2NO_2016",
                                             SummerTrollMix2016[5:8]),
                               nm = names(Troll2016_8RG_EstimatesStats_Formatted))
+dput(x = Troll2016MixNames, file = "Objects/Troll2016MixNames.txt")
 
 
 Troll2016_SampleSizes <- sapply(Troll2016MixNames, function(mix) {sum(SEAK2016Mixtures_SampSizes[mix])} )
@@ -394,3 +397,413 @@ abline(h = c(-0.005,  1.005),  v  =  c(-0.5,  1.5), lwd = 5, col = 'black')
 dev.off()
 dev.off()
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Resummarize 2016 Comm Troll Stratified Estimates to 18RGs ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Define RGs
+
+GroupVec33RG_to18RG <- GroupVec18[GroupVec33RG_to26RG]
+dput(x = GroupVec33RG_to18RG, file = "Objects/GroupVec33RG_to18RG.txt")
+
+GroupVec33RG_to4RG <- GroupVec4[GroupVec33RG_to26RG]
+dput(x = GroupVec33RG_to4RG, file = "Objects/GroupVec33RG_to4RG.txt")
+
+### Unstratified
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+# 18RGs
+EWintTroll2016_18RG_EstimatesStats <- 
+  CustomCombineBAYESOutput.GCL(groupvec = GroupVec33RG_to18RG, groupnames = GroupNames18,
+                               maindir = "BAYES/Output/33RG/EWint_2016", 
+                               mixvec = WinterTrollMix2016[1:2], prior = "",
+                               ext = "RGN", nchains = 5, burn = 0.5, alpha = 0.1, PosteriorOutput = FALSE)
+
+LWintTroll2016_18RG_EstimatesStats <- 
+  CustomCombineBAYESOutput.GCL(groupvec = GroupVec33RG_to18RG, groupnames = GroupNames18,
+                               maindir = "BAYES/Output/33RG/LWint_2016", 
+                               mixvec = WinterTrollMix2016[3:4], prior = "",
+                               ext = "RGN", nchains = 5, burn = 0.5, alpha = 0.1, PosteriorOutput = FALSE)
+
+SpringTroll2016_18RG_EstimatesStats <- 
+  CustomCombineBAYESOutput.GCL(groupvec = GroupVec33RG_to18RG, groupnames = GroupNames18,
+                               maindir = "BAYES/Output/33RG/Spring_2016", 
+                               mixvec = SpringTrollMix2016, prior = "",
+                               ext = "RGN", nchains = 5, burn = 0.5, alpha = 0.1, PosteriorOutput = FALSE)
+
+SumRet1Troll2016_18RG_EstimatesStats <- 
+  CustomCombineBAYESOutput.GCL(groupvec = GroupVec33RG_to18RG, groupnames = GroupNames18,
+                               maindir = "BAYES/Output/33RG/SumRet1_2016", 
+                               mixvec = SummerTrollMix2016[1:4], prior = "",
+                               ext = "RGN", nchains = 5, burn = 0.5, alpha = 0.1, PosteriorOutput = FALSE)
+
+SumRet2Troll2016_18RG_EstimatesStats <- 
+  CustomCombineBAYESOutput.GCL(groupvec = GroupVec33RG_to18RG, groupnames = GroupNames18,
+                               maindir = "BAYES/Output/33RG/SumRet2_2016", 
+                               mixvec = SummerTrollMix2016[5:8], prior = "",
+                               ext = "RGN", nchains = 5, burn = 0.5, alpha = 0.1, PosteriorOutput = FALSE)
+
+TrollByQuad2016_18RG_EstimatesStats <- c(EWintTroll2016_18RG_EstimatesStats,
+                                        LWintTroll2016_18RG_EstimatesStats,
+                                        SpringTroll2016_18RG_EstimatesStats,
+                                        SumRet1Troll2016_18RG_EstimatesStats,
+                                        SumRet2Troll2016_18RG_EstimatesStats)
+any(sapply(TrollByQuad2016_18RG_EstimatesStats, function(mix) {any(mix[, "GR"] > 1.2)}))
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Dput files
+# dir.create("Estimates objects")
+# Grab estimates objects and dput in "Estimates objects"
+objects2dput <- c("EWintTroll2016_18RG_EstimatesStats", 
+                  "LWintTroll2016_18RG_EstimatesStats", 
+                  "SpringTroll2016_18RG_EstimatesStats", 
+                  "SumRet1Troll2016_18RG_EstimatesStats",
+                  "SumRet2Troll2016_18RG_EstimatesStats",
+                  "TrollByQuad2016_18RG_EstimatesStats")
+
+invisible(sapply(objects2dput, function(obj) {
+  dput(x = get(obj), file = paste0("Estimates objects/", obj, ".txt"))
+})); rm(objects2dput)
+
+
+
+### Stratified
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 18RGs
+EWintTroll2016_18RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec33RG_to18RG, groupnames = GroupNames18,
+                          maindir="BAYES/Output/33RG/EWint_2016",
+                          mixvec = c("EWintNISISO_2016", "EWintNO_2016"), catchvec = c(4216, 25147), 
+                          newname = "StratifiedEWint2016_90percentCI_18RG", priorname = "", nchains = 5)
+
+LWintTroll2016_18RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec33RG_to18RG, groupnames = GroupNames18,
+                          maindir="BAYES/Output/33RG/LWint_2016",
+                          mixvec = c("LWintNISISO_2016", "LWintNO_2016"), catchvec = c(5248, 17680), 
+                          newname = "StratifiedLWint2016_90percentCI_18RG", priorname = "", nchains = 5)
+
+SpringTroll2016_18RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec33RG_to18RG, groupnames = GroupNames18,
+                          maindir="BAYES/Output/33RG/Spring_2016",
+                          mixvec = c("SpringNI_2016", "SpringNO_2016", "SpringSI_2016", "SpringSO_2016"), catchvec = c(9270, 17012, 15160, 1031), 
+                          newname = "StratifiedSpring2016_90percentCI_18RG", priorname = "", nchains = 5)
+
+SumRet1Troll2016_18RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec33RG_to18RG, groupnames = GroupNames18,
+                          maindir="BAYES/Output/33RG/SumRet1_2016",
+                          mixvec = c("Summer1NI_2016", "Summer1NO_2016", "Summer1SI_2016", "Summer1SO_2016"), catchvec = c(3805, 80323, 3618, 18888), 
+                          newname = "StratifiedSumRet12016_90percentCI_18RG", priorname = "", nchains = 5)
+
+SumRet2Troll2016_18RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec33RG_to18RG, groupnames = GroupNames18,
+                          maindir="BAYES/Output/33RG/SumRet2_2016",
+                          mixvec = c("Summer2NI_2016", "Summer2NO_2016", "Summer2SI_2016", "Summer2SO_2016"), catchvec = c(2147, 56208, 1774, 14111), 
+                          newname = "StratifiedSumRet22016_90percentCI_18RG", priorname = "", nchains = 5)
+
+
+AllYearTroll2016_18RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec33RG_to18RG, groupnames = GroupNames18,
+                          maindir="BAYES/Output/33RG/AllYearTroll_2016",
+                          mixvec = c("EWintNISISO_2016", "EWintNO_2016", "LWintNISISO_2016", "LWintNO_2016", 
+                                     "SpringNI_2016", "SpringNO_2016", "SpringSI_2016", "SpringSO_2016", 
+                                     "Summer1NI_2016", "Summer1NO_2016", "Summer1SI_2016", "Summer1SO_2016", 
+                                     "Summer2NI_2016", "Summer2NO_2016", "Summer2SI_2016", "Summer2SO_2016"),
+                          catchvec = c(4216, 25147, 5248, 17680,
+                                       9270, 17012, 15160, 1031,
+                                       3805, 80323, 3618, 18888,
+                                       2147, 56208, 1774, 14111), 
+                          newname = "StratifiedAllYearTroll2016_90percentCI_18RG", priorname = "", nchains = 5)
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Dput files
+# Grab estimates objects and dput in "Estimates objects"
+objects2dput <- c("EWintTroll2016_18RG_StratifiedEstimatesStats", 
+                  "LWintTroll2016_18RG_StratifiedEstimatesStats", 
+                  "SpringTroll2016_18RG_StratifiedEstimatesStats", 
+                  "SumRet1Troll2016_18RG_StratifiedEstimatesStats",
+                  "SumRet2Troll2016_18RG_StratifiedEstimatesStats", 
+                  "AllYearTroll2016_18RG_StratifiedEstimatesStats")
+
+invisible(sapply(objects2dput, function(obj) {
+  dput(x = get(obj)$Stats, file = paste0("Estimates objects/", obj, ".txt"))
+})); rm(objects2dput)
+
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Create 2016 summary tables for Comm Troll 18 RGs ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## Get objects
+SEAK16estimatesobjects <- list.files(path = "Estimates objects", recursive = FALSE, pattern = "_18RG")
+SEAK16estimatesobjects
+
+invisible(sapply(SEAK16estimatesobjects, function(objct) {assign(x = unlist(strsplit(x = objct, split = ".txt")), value = dget(file = paste(getwd(), "Estimates objects", objct, sep = "/")), pos = 1) })); beep(2)
+
+
+# Dget all estimates stats
+SEAK16estimatesobjects <- unlist(lapply(SEAK16estimatesobjects, function(objct) {unlist(strsplit(x = objct, split = ".txt"))}))
+
+Troll2016_18RG_EstimatesStats <- list(
+  "EWintNO_2016" = EWintTroll2016_18RG_EstimatesStats[["EWintNO_2016"]],
+  "EWintAllQuad_2016" = EWintTroll2016_18RG_StratifiedEstimatesStats,
+  "LWintNO_2016" = LWintTroll2016_18RG_EstimatesStats[["LWintNO_2016"]],
+  "LWintAllQuad_2016" = LWintTroll2016_18RG_StratifiedEstimatesStats,
+  "SpringNO_2016" = SpringTroll2016_18RG_EstimatesStats[["SpringNO_2016"]],
+  "SpringSI_2016" = SpringTroll2016_18RG_EstimatesStats[["SpringSI_2016"]],
+  "SpringAllQuad_2016" = SpringTroll2016_18RG_StratifiedEstimatesStats,
+  "SumRet1NO_2016" = SumRet1Troll2016_18RG_EstimatesStats[["Summer1NO_2016"]],
+  "SumRet1AllQuad_2016" = SumRet1Troll2016_18RG_StratifiedEstimatesStats,
+  "SumRet2NO_2016" = SumRet2Troll2016_18RG_EstimatesStats[["Summer2NO_2016"]],
+  "SumRet2AllQuad_2016" = SumRet2Troll2016_18RG_StratifiedEstimatesStats
+)
+dput(x = Troll2016_18RG_EstimatesStats, file = "Estimates objects/Troll2016_18RG_EstimatesStats.txt")
+
+# Check GR
+any(sapply(Troll2016_18RG_EstimatesStats, function(mix) {any(mix[, "GR"] > 1.2)}))
+
+# Publishable names
+GroupNames18Pub <- c(GroupNames26Pub[c(3:7, 9:12, 16:18, 20:21, 23:25)], "Other")
+dput(x = GroupNames18Pub, file = "Objects/GroupNames18Pub.txt")
+
+
+# Reformat estimates stats
+Troll2016_18RG_EstimatesStats_Formatted <- sapply(Troll2016_18RG_EstimatesStats, function(yr) {
+  matrix(data = yr[, 1:5], nrow = 18, ncol = 5, dimnames = list(GroupNames18Pub, c("Mean", "SD", "Median", "5%", "95%")))
+}, simplify = FALSE)
+
+
+SEAK2016Mixtures <- list.files(path = "BAYES/Mixture", full.names = FALSE)
+SEAK2016Mixtures_SampSizes <- sapply(SEAK2016Mixtures, function(mix) {dim(read.table(file = paste0("BAYES/Mixture/", mix)))[1]} )
+names(SEAK2016Mixtures_SampSizes) <- sapply(names(SEAK2016Mixtures_SampSizes), function(mix) {unlist(strsplit(x = mix, split = ".mix"))[1]})
+
+
+Troll2016_SampleSizes <- sapply(Troll2016MixNames, function(mix) {sum(SEAK2016Mixtures_SampSizes[mix])} )
+
+# Create fully formatted spreadsheat
+EstimatesStats <- Troll2016_18RG_EstimatesStats_Formatted
+SampSizes <- Troll2016_SampleSizes
+
+# dir.create("Estimates tables")
+
+for(mix in names(EstimatesStats)) {
+  
+  TableX <- matrix(data = "", nrow = 21, ncol = 7)
+  TableX[1, 3] <- paste(Troll2016PubNames[mix], "(n=", SampSizes[mix], ")")
+  TableX[2, 6] <- "90% CI"
+  TableX[3, 2:7] <- c("Reporting Group", colnames(EstimatesStats[[mix]]))
+  TableX[4:21, 1] <- 1:18
+  TableX[4:21, 2] <- rownames(EstimatesStats[[mix]])
+  TableX[4:21, 3:7] <- formatC(x = EstimatesStats[[mix]], digits = 3, format = "f")
+  
+  write.xlsx(x = TableX, file = "Estimates tables/Troll2016_18RG_StratifiedEstimatesStats_FormattedPretty.xlsx",
+             col.names = FALSE, row.names = FALSE, sheetName = paste(mix, " Troll 18RG"), append = TRUE)
+  
+}
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Resummarize 2016 Comm Troll Stratified Estimates to 4RGs ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Define RGs
+
+GroupVec33RG_to4RG <- GroupVec4[GroupVec33RG_to26RG]
+dput(x = GroupVec33RG_to4RG, file = "Objects/GroupVec33RG_to4RG.txt")
+
+### Unstratified
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+# 4RGs
+EWintTroll2016_4RG_EstimatesStats <- 
+  CustomCombineBAYESOutput.GCL(groupvec = GroupVec33RG_to4RG, groupnames = GroupNames4,
+                               maindir = "BAYES/Output/33RG/EWint_2016", 
+                               mixvec = WinterTrollMix2016[1:2], prior = "",
+                               ext = "RGN", nchains = 5, burn = 0.5, alpha = 0.1, PosteriorOutput = FALSE)
+
+LWintTroll2016_4RG_EstimatesStats <- 
+  CustomCombineBAYESOutput.GCL(groupvec = GroupVec33RG_to4RG, groupnames = GroupNames4,
+                               maindir = "BAYES/Output/33RG/LWint_2016", 
+                               mixvec = WinterTrollMix2016[3:4], prior = "",
+                               ext = "RGN", nchains = 5, burn = 0.5, alpha = 0.1, PosteriorOutput = FALSE)
+
+SpringTroll2016_4RG_EstimatesStats <- 
+  CustomCombineBAYESOutput.GCL(groupvec = GroupVec33RG_to4RG, groupnames = GroupNames4,
+                               maindir = "BAYES/Output/33RG/Spring_2016", 
+                               mixvec = SpringTrollMix2016, prior = "",
+                               ext = "RGN", nchains = 5, burn = 0.5, alpha = 0.1, PosteriorOutput = FALSE)
+
+SumRet1Troll2016_4RG_EstimatesStats <- 
+  CustomCombineBAYESOutput.GCL(groupvec = GroupVec33RG_to4RG, groupnames = GroupNames4,
+                               maindir = "BAYES/Output/33RG/SumRet1_2016", 
+                               mixvec = SummerTrollMix2016[1:4], prior = "",
+                               ext = "RGN", nchains = 5, burn = 0.5, alpha = 0.1, PosteriorOutput = FALSE)
+
+SumRet2Troll2016_4RG_EstimatesStats <- 
+  CustomCombineBAYESOutput.GCL(groupvec = GroupVec33RG_to4RG, groupnames = GroupNames4,
+                               maindir = "BAYES/Output/33RG/SumRet2_2016", 
+                               mixvec = SummerTrollMix2016[5:8], prior = "",
+                               ext = "RGN", nchains = 5, burn = 0.5, alpha = 0.1, PosteriorOutput = FALSE)
+
+TrollByQuad2016_4RG_EstimatesStats <- c(EWintTroll2016_4RG_EstimatesStats,
+                                         LWintTroll2016_4RG_EstimatesStats,
+                                         SpringTroll2016_4RG_EstimatesStats,
+                                         SumRet1Troll2016_4RG_EstimatesStats,
+                                         SumRet2Troll2016_4RG_EstimatesStats)
+any(sapply(TrollByQuad2016_4RG_EstimatesStats, function(mix) {any(mix[, "GR"] > 1.2)}))
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Dput files
+# dir.create("Estimates objects")
+# Grab estimates objects and dput in "Estimates objects"
+objects2dput <- c("EWintTroll2016_4RG_EstimatesStats", 
+                  "LWintTroll2016_4RG_EstimatesStats", 
+                  "SpringTroll2016_4RG_EstimatesStats", 
+                  "SumRet1Troll2016_4RG_EstimatesStats",
+                  "SumRet2Troll2016_4RG_EstimatesStats",
+                  "TrollByQuad2016_4RG_EstimatesStats")
+
+invisible(sapply(objects2dput, function(obj) {
+  dput(x = get(obj), file = paste0("Estimates objects/", obj, ".txt"))
+})); rm(objects2dput)
+
+
+
+### Stratified
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 4RGs
+EWintTroll2016_4RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec33RG_to4RG, groupnames = GroupNames4,
+                          maindir="BAYES/Output/33RG/EWint_2016",
+                          mixvec = c("EWintNISISO_2016", "EWintNO_2016"), catchvec = c(4216, 25147), 
+                          newname = "StratifiedEWint2016_90percentCI_4RG", priorname = "", nchains = 5)
+
+LWintTroll2016_4RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec33RG_to4RG, groupnames = GroupNames4,
+                          maindir="BAYES/Output/33RG/LWint_2016",
+                          mixvec = c("LWintNISISO_2016", "LWintNO_2016"), catchvec = c(5248, 17680), 
+                          newname = "StratifiedLWint2016_90percentCI_4RG", priorname = "", nchains = 5)
+
+SpringTroll2016_4RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec33RG_to4RG, groupnames = GroupNames4,
+                          maindir="BAYES/Output/33RG/Spring_2016",
+                          mixvec = c("SpringNI_2016", "SpringNO_2016", "SpringSI_2016", "SpringSO_2016"), catchvec = c(9270, 17012, 15160, 1031), 
+                          newname = "StratifiedSpring2016_90percentCI_4RG", priorname = "", nchains = 5)
+
+SumRet1Troll2016_4RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec33RG_to4RG, groupnames = GroupNames4,
+                          maindir="BAYES/Output/33RG/SumRet1_2016",
+                          mixvec = c("Summer1NI_2016", "Summer1NO_2016", "Summer1SI_2016", "Summer1SO_2016"), catchvec = c(3805, 80323, 3618, 18888), 
+                          newname = "StratifiedSumRet12016_90percentCI_4RG", priorname = "", nchains = 5)
+
+SumRet2Troll2016_4RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec33RG_to4RG, groupnames = GroupNames4,
+                          maindir="BAYES/Output/33RG/SumRet2_2016",
+                          mixvec = c("Summer2NI_2016", "Summer2NO_2016", "Summer2SI_2016", "Summer2SO_2016"), catchvec = c(2147, 56208, 1774, 14111), 
+                          newname = "StratifiedSumRet22016_90percentCI_4RG", priorname = "", nchains = 5)
+
+
+AllYearTroll2016_4RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec33RG_to4RG, groupnames = GroupNames4,
+                          maindir="BAYES/Output/33RG/AllYearTroll_2016",
+                          mixvec = c("EWintNISISO_2016", "EWintNO_2016", "LWintNISISO_2016", "LWintNO_2016", 
+                                     "SpringNI_2016", "SpringNO_2016", "SpringSI_2016", "SpringSO_2016", 
+                                     "Summer1NI_2016", "Summer1NO_2016", "Summer1SI_2016", "Summer1SO_2016", 
+                                     "Summer2NI_2016", "Summer2NO_2016", "Summer2SI_2016", "Summer2SO_2016"),
+                          catchvec = c(4216, 25147, 5248, 17680,
+                                       9270, 17012, 15160, 1031,
+                                       3805, 80323, 3618, 18888,
+                                       2147, 56208, 1774, 14111), 
+                          newname = "StratifiedAllYearTroll2016_90percentCI_4RG", priorname = "", nchains = 5)
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Dput files
+# Grab estimates objects and dput in "Estimates objects"
+objects2dput <- c("EWintTroll2016_4RG_StratifiedEstimatesStats", 
+                  "LWintTroll2016_4RG_StratifiedEstimatesStats", 
+                  "SpringTroll2016_4RG_StratifiedEstimatesStats", 
+                  "SumRet1Troll2016_4RG_StratifiedEstimatesStats",
+                  "SumRet2Troll2016_4RG_StratifiedEstimatesStats", 
+                  "AllYearTroll2016_4RG_StratifiedEstimatesStats")
+
+invisible(sapply(objects2dput, function(obj) {
+  dput(x = get(obj)$Stats, file = paste0("Estimates objects/", obj, ".txt"))
+})); rm(objects2dput)
+
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Create 2016 summary tables for Comm Troll 4 RGs ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## Get objects
+SEAK16estimatesobjects <- list.files(path = "Estimates objects", recursive = FALSE, pattern = "_4RG")
+SEAK16estimatesobjects
+
+invisible(sapply(SEAK16estimatesobjects, function(objct) {assign(x = unlist(strsplit(x = objct, split = ".txt")), value = dget(file = paste(getwd(), "Estimates objects", objct, sep = "/")), pos = 1) })); beep(2)
+
+
+# Dget all estimates stats
+SEAK16estimatesobjects <- unlist(lapply(SEAK16estimatesobjects, function(objct) {unlist(strsplit(x = objct, split = ".txt"))}))
+
+Troll2016_4RG_EstimatesStats <- list(
+  "EWintNO_2016" = EWintTroll2016_4RG_EstimatesStats[["EWintNO_2016"]],
+  "EWintAllQuad_2016" = EWintTroll2016_4RG_StratifiedEstimatesStats,
+  "LWintNO_2016" = LWintTroll2016_4RG_EstimatesStats[["LWintNO_2016"]],
+  "LWintAllQuad_2016" = LWintTroll2016_4RG_StratifiedEstimatesStats,
+  "SpringNO_2016" = SpringTroll2016_4RG_EstimatesStats[["SpringNO_2016"]],
+  "SpringSI_2016" = SpringTroll2016_4RG_EstimatesStats[["SpringSI_2016"]],
+  "SpringAllQuad_2016" = SpringTroll2016_4RG_StratifiedEstimatesStats,
+  "SumRet1NO_2016" = SumRet1Troll2016_4RG_EstimatesStats[["Summer1NO_2016"]],
+  "SumRet1AllQuad_2016" = SumRet1Troll2016_4RG_StratifiedEstimatesStats,
+  "SumRet2NO_2016" = SumRet2Troll2016_4RG_EstimatesStats[["Summer2NO_2016"]],
+  "SumRet2AllQuad_2016" = SumRet2Troll2016_4RG_StratifiedEstimatesStats
+)
+dput(x = Troll2016_4RG_EstimatesStats, file = "Estimates objects/Troll2016_4RG_EstimatesStats.txt")
+
+# Check GR
+any(sapply(Troll2016_4RG_EstimatesStats, function(mix) {any(mix[, "GR"] > 1.2)}))
+
+# Publishable names
+GroupNames4Pub <- c(GroupNames4[1:3], "US South")
+dput(x = GroupNames4Pub, file = "Objects/GroupNames4Pub.txt")
+
+
+# Reformat estimates stats
+Troll2016_4RG_EstimatesStats_Formatted <- sapply(Troll2016_4RG_EstimatesStats, function(yr) {
+  matrix(data = yr[, 1:5], nrow = 4, ncol = 5, dimnames = list(GroupNames4Pub, c("Mean", "SD", "Median", "5%", "95%")))
+}, simplify = FALSE)
+
+
+SEAK2016Mixtures <- list.files(path = "BAYES/Mixture", full.names = FALSE)
+SEAK2016Mixtures_SampSizes <- sapply(SEAK2016Mixtures, function(mix) {dim(read.table(file = paste0("BAYES/Mixture/", mix)))[1]} )
+names(SEAK2016Mixtures_SampSizes) <- sapply(names(SEAK2016Mixtures_SampSizes), function(mix) {unlist(strsplit(x = mix, split = ".mix"))[1]})
+
+
+Troll2016_SampleSizes <- sapply(Troll2016MixNames, function(mix) {sum(SEAK2016Mixtures_SampSizes[mix])} )
+
+# Create fully formatted spreadsheat
+EstimatesStats <- Troll2016_4RG_EstimatesStats_Formatted
+SampSizes <- Troll2016_SampleSizes
+
+# dir.create("Estimates tables")
+
+for(mix in names(EstimatesStats)) {
+  
+  TableX <- matrix(data = "", nrow = 7, ncol = 7)
+  TableX[1, 3] <- paste(Troll2016PubNames[mix], "(n=", SampSizes[mix], ")")
+  TableX[2, 6] <- "90% CI"
+  TableX[3, 2:7] <- c("Reporting Group", colnames(EstimatesStats[[mix]]))
+  TableX[4:7, 1] <- seq(dim(EstimatesStats[[1]])[1])
+  TableX[4:7, 2] <- rownames(EstimatesStats[[mix]])
+  TableX[4:7, 3:7] <- formatC(x = EstimatesStats[[mix]], digits = 3, format = "f")
+  
+  write.xlsx(x = TableX, file = "Estimates tables/Troll2016_4RG_StratifiedEstimatesStats_FormattedPretty.xlsx",
+             col.names = FALSE, row.names = FALSE, sheetName = paste(mix, " Troll 4RG"), append = TRUE)
+  
+}
