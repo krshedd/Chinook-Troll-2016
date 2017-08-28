@@ -807,3 +807,102 @@ for(mix in names(EstimatesStats)) {
              col.names = FALSE, row.names = FALSE, sheetName = paste(mix, " Troll 4RG"), append = TRUE)
   
 }
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Summer Retention 2 8RG Driver Stock Resummarization ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Pulled a fresh harvest report from MTA lab website to get "up to date" harvest numbers
+# Copied all relevant BAYES files into one location
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## 2016
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK16")
+
+SumRet2Troll2016_8RG_StratifiedEstimatesStats <- dget(file = "Estimates objects/SumRet2Troll2016_8RG_StratifiedEstimatesStats.txt")
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## 2015
+# No 2nd retention
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## 2014
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK14")
+
+# Need a new groupvec of length 27, not 26, because Chilkat was broken out of NSEAK
+
+SumRet2Troll2014_8RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = c(1, GroupVec8), groupnames = GroupNames8,
+                          maindir="BAYES/Output/AllYearTroll_2014",
+                          mixvec = c("SumRet2NISISO.2014", "SumRet2NO.2014"),
+                          catchvec = c(24365, 31288), 
+                          newname = "StratifiedSumRet2Troll2014_90percentCI_8RG", priorname = "", nchains = 5)
+
+dput(x = SumRet2Troll2014_8RG_StratifiedEstimatesStats$Stats, file = "Estimates objects/SumRet2Troll2014_8RG_StratifiedEstimatesStats.txt")
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## 2013
+# No 2nd retention
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## 2012
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK12")
+
+SumRet2Troll2012_8RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec8, groupnames = GroupNames8,
+                          maindir="BAYES/Output/AllYearTroll_2012",
+                          mixvec = c("SumRet2NISISO.2012", "SumRet2NO.2012"),
+                          catchvec = c(20056, 53914), 
+                          newname = "StratifiedSumRet2Troll2012_90percentCI_8RG", priorname = "", nchains = 5)
+
+dput(x = SumRet2Troll2012_8RG_StratifiedEstimatesStats$Stats, file = "Estimates objects/SumRet2Troll2012_8RG_StratifiedEstimatesStats.txt")
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## 2011
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK11")
+
+SumRet2Troll2011_8RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec8, groupnames = GroupNames8,
+                          maindir="BAYES/Troll/Output/AllYearTroll_2011",
+                          mixvec = c("SumRet2NISISO.2011", "SumRet2NO.2011"),
+                          catchvec = c(13364, 16372), 
+                          newname = "StratifiedSumRet2Troll2011_90percentCI_8RG", priorname = "", nchains = 5)
+
+dput(x = SumRet2Troll2011_8RG_StratifiedEstimatesStats$Stats, file = "Estimates objects/SumRet2Troll2011_8RG_StratifiedEstimatesStats.txt")
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## 2010
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK10")
+
+SumRet2Troll2010_8RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec8, groupnames = GroupNames8,
+                          maindir="BAYES/Troll/Output/AllYearTroll_2010",
+                          mixvec = c("SummerR2NISISO.2010", "SummerR2NO.2010"),
+                          catchvec = c(22025, 26430), 
+                          newname = "StratifiedSumRet2Troll2010_90percentCI_8RG", priorname = "", nchains = 5)
+
+dput(x = SumRet2Troll2010_8RG_StratifiedEstimatesStats$Stats, file = "Estimates objects/SumRet2Troll2010_8RG_StratifiedEstimatesStats.txt")
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## 2009
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK09")
+
+SumRet2Troll2009_8RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec8, groupnames = GroupNames8,
+                          maindir="BAYES/Troll/Output/AllYearTroll_2009",
+                          mixvec = c("SumRet2NISI_2009", "SumRet2NOSO_2009"),
+                          catchvec = c(1796, 31216), 
+                          newname = "StratifiedSumRet2Troll2009_90percentCI_8RG", priorname = "", nchains = 5)
+
+dput(x = SumRet2Troll2009_8RG_StratifiedEstimatesStats$Stats, file = "Estimates objects/SumRet2Troll2009_8RG_StratifiedEstimatesStats.txt")
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cbind("AY2009" = SumRet2Troll2009_8RG_StratifiedEstimatesStats$Stats[, "mean"],
+      "AY2010" = SumRet2Troll2010_8RG_StratifiedEstimatesStats$Stats[, "mean"],
+      "AY2011" = SumRet2Troll2011_8RG_StratifiedEstimatesStats$Stats[, "mean"],
+      "AY2012" = SumRet2Troll2012_8RG_StratifiedEstimatesStats$Stats[, "mean"],
+      "AY2013" = rep(NA, 8),
+      "AY2014" = SumRet2Troll2014_8RG_StratifiedEstimatesStats$Stats[, "mean"],
+      "AY2015" = rep(NA, 8),
+      "AY2016" = SumRet2Troll2016_8RG_StratifiedEstimatesStats[, "mean"])
