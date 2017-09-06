@@ -756,8 +756,10 @@ Troll2016_4RG_EstimatesStats <- list(
   "EWintAllQuad_2016" = EWintTroll2016_4RG_StratifiedEstimatesStats,
   "LWintNO_2016" = LWintTroll2016_4RG_EstimatesStats[["LWintNO_2016"]],
   "LWintAllQuad_2016" = LWintTroll2016_4RG_StratifiedEstimatesStats,
+  "SpringNI_2016" = SpringTroll2016_4RG_EstimatesStats[["SpringNI_2016"]],
   "SpringNO_2016" = SpringTroll2016_4RG_EstimatesStats[["SpringNO_2016"]],
   "SpringSI_2016" = SpringTroll2016_4RG_EstimatesStats[["SpringSI_2016"]],
+  "SpringSO_2016" = SpringTroll2016_4RG_EstimatesStats[["SpringSO_2016"]],
   "SpringAllQuad_2016" = SpringTroll2016_4RG_StratifiedEstimatesStats,
   "SumRet1NO_2016" = SumRet1Troll2016_4RG_EstimatesStats[["Summer1NO_2016"]],
   "SumRet1AllQuad_2016" = SumRet1Troll2016_4RG_StratifiedEstimatesStats,
@@ -784,8 +786,40 @@ SEAK2016Mixtures <- list.files(path = "BAYES/Mixture", full.names = FALSE)
 SEAK2016Mixtures_SampSizes <- sapply(SEAK2016Mixtures, function(mix) {dim(read.table(file = paste0("BAYES/Mixture/", mix)))[1]} )
 names(SEAK2016Mixtures_SampSizes) <- sapply(names(SEAK2016Mixtures_SampSizes), function(mix) {unlist(strsplit(x = mix, split = ".mix"))[1]})
 
+Troll2016MixNames_4RG <- setNames(object = list("EWintNO_2016",
+                                                WinterTrollMix2016[1:2],
+                                                "LWintNO_2016",
+                                                WinterTrollMix2016[3:4],
+                                                "SpringNI_2016",
+                                                "SpringNO_2016",
+                                                "SpringSI_2016",
+                                                "SpringSO_2016",
+                                                SpringTrollMix2016,
+                                                "Summer1NO_2016",
+                                                SummerTrollMix2016[1:4],
+                                                "Summer2NO_2016",
+                                                SummerTrollMix2016[5:8]),
+                                  nm = names(Troll2016_4RG_EstimatesStats_Formatted))
+dput(x = Troll2016MixNames_4RG, file = "Objects/Troll2016MixNames_4RG.txt")
 
-Troll2016_SampleSizes <- sapply(Troll2016MixNames, function(mix) {sum(SEAK2016Mixtures_SampSizes[mix])} )
+Troll2016_SampleSizes <- sapply(Troll2016MixNames_4RG, function(mix) {sum(SEAK2016Mixtures_SampSizes[mix])} )
+
+Troll2016PubNames_4RG <- setNames(object = c("Northern Outside Quadrant",
+                                             "All Quadrants",
+                                             "Northern Outside Quadrant",
+                                             "All Quadrants",
+                                             "Northern Inside Quadrant",
+                                             "Northern Outside Quadrant",
+                                             "Southern Inside Quadrant",
+                                             "Southern Outside Quadrant",
+                                             "All Quadrants",
+                                             "Northern Outside Quadrant",
+                                             "All Quadrants",
+                                             "Northern Outside Quadrant",
+                                             "All Quadrants"), 
+                                  nm = names(Troll2016_4RG_EstimatesStats_Formatted))
+dput(x = Troll2016PubNames_4RG, file = "Objects/Troll2016PubNames_4RG.txt")
+
 
 # Create fully formatted spreadsheat
 EstimatesStats <- Troll2016_4RG_EstimatesStats_Formatted
@@ -796,7 +830,7 @@ SampSizes <- Troll2016_SampleSizes
 for(mix in names(EstimatesStats)) {
   
   TableX <- matrix(data = "", nrow = 7, ncol = 7)
-  TableX[1, 3] <- paste(Troll2016PubNames[mix], "(n=", SampSizes[mix], ")")
+  TableX[1, 3] <- paste(Troll2016PubNames_4RG[mix], "(n=", SampSizes[mix], ")")
   TableX[2, 6] <- "90% CI"
   TableX[3, 2:7] <- c("Reporting Group", colnames(EstimatesStats[[mix]]))
   TableX[4:7, 1] <- seq(dim(EstimatesStats[[1]])[1])
@@ -810,7 +844,7 @@ for(mix in names(EstimatesStats)) {
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#### Summer Retention 2 8RG Driver Stock Resummarization ####
+#### Summer Retention 2 8RG Driver Stock Resummarization 2009-2016 ####
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Pulled a fresh harvest report from MTA lab website to get "up to date" harvest numbers
 # Copied all relevant BAYES files into one location
