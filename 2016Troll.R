@@ -940,3 +940,457 @@ cbind("AY2009" = SumRet2Troll2009_8RG_StratifiedEstimatesStats$Stats[, "mean"],
       "AY2014" = SumRet2Troll2014_8RG_StratifiedEstimatesStats$Stats[, "mean"],
       "AY2015" = rep(NA, 8),
       "AY2016" = SumRet2Troll2016_8RG_StratifiedEstimatesStats[, "mean"])
+
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Resummarize 2016 Sport Stratified Estimates to Driver Stock RGs ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Define RGs
+GroupVec33RG_to8RG
+
+SportMix2016 <- c("KTNSport_2016", "PBGWRNSport_2016", "InsideSport_2016", "OutSportPer1_2016", "OutSportPer2_2016")
+SportMixPub2016 <- c("Ketchikan", "Petersburg-Wrangell", "Northern Inside", "Outside All Year", "Outside Biweek 9-13", "Outside Biweek 14-18")
+
+dput(x = SportMix2016, file = "Objects/SportMix2016.txt")
+
+### Unstratified
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+# 8RGs
+Sport2016_8RG_EstimatesStats <- 
+  CustomCombineBAYESOutput.GCL(groupvec = GroupVec33RG_to8RG, groupnames = GroupNames8,
+                               maindir = "BAYES/Output/33RG", 
+                               mixvec = SportMix2016, prior = "",
+                               ext = "RGN", nchains = 5, burn = 0.5, alpha = 0.1, PosteriorOutput = FALSE)
+
+any(sapply(Sport2016_8RG_EstimatesStats, function(mix) {any(mix[, "GR"] > 1.2)}))
+sapply(Sport2016_8RG_EstimatesStats, function(mix) {any(mix[, "GR"] > 1.2)})  # convergence issues with PBGWRN
+Sport2016_8RG_EstimatesStats$PBGWRNSport_2016[, "GR"]  # between SEAK/TBR and NCBC, digging through 33RG raw output this is an issue between SSEAK and Skeena
+# Sara went ahead and ran it out to 80K, but didn't converge, so she went ahead and averaged all 5 chains
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Dput files
+# dir.create("Estimates objects")
+# Grab estimates objects and dput in "Estimates objects"
+objects2dput <- c("Sport2016_8RG_EstimatesStats")
+
+invisible(sapply(objects2dput, function(obj) {
+  dput(x = get(obj), file = paste0("Estimates objects/", obj, ".txt"))
+})); rm(objects2dput)
+
+
+
+### Stratified
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 8RGs
+Sport2016_8RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec33RG_to8RG, groupnames = GroupNames8,
+                          maindir="BAYES/Output/33RG",
+                          mixvec = SportMix2016[4:5], catchvec = c(41119, 14590), 
+                          newname = "StratifiedOutSport2016_90percentCI_8RG", priorname = "", nchains = 5)  # got harvest numbers from "V:\Analysis\1_SEAK\Chinook\Mixture\SEAK16\Sport Estimates 2016.xlsx" tab "Summary"
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Dput files
+# Grab estimates objects and dput in "Estimates objects"
+objects2dput <- c("Sport2016_8RG_StratifiedEstimatesStats")
+
+invisible(sapply(objects2dput, function(obj) {
+  dput(x = get(obj)$Stats, file = paste0("Estimates objects/", obj, ".txt"))
+})); rm(objects2dput)
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Create 2016 summary tables ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## Get objects
+SEAK16estimatesobjects <- list.files(path = "Estimates objects", recursive = FALSE, pattern = "Sport2016_8RG")
+SEAK16estimatesobjects
+
+invisible(sapply(SEAK16estimatesobjects, function(objct) {assign(x = unlist(strsplit(x = objct, split = ".txt")), value = dget(file = paste(getwd(), "Estimates objects", objct, sep = "/")), pos = 1) })); beep(2)
+
+
+# Dget all estimates stats
+SEAK16estimatesobjects <- unlist(lapply(SEAK16estimatesobjects, function(objct) {unlist(strsplit(x = objct, split = ".txt"))}))
+
+Sport2016_8RG_EstimatesStats_Final <- c(
+  Sport2016_8RG_EstimatesStats[1:3],
+  list("OutSport_2016" = Sport2016_8RG_StratifiedEstimatesStats),
+  Sport2016_8RG_EstimatesStats[4:5]
+)
+dput(x = Sport2016_8RG_EstimatesStats_Final, file = "Estimates objects/Sport2016_8RG_EstimatesStats_Final.txt")
+
+# Check GR
+any(sapply(Sport2016_8RG_EstimatesStats_Final, function(mix) {any(mix[, "GR"] > 1.2)}))
+sapply(Sport2016_8RG_EstimatesStats_Final, function(mix) {any(mix[, "GR"] > 1.2)})  # Known PBGWRN issue
+
+
+# Reformat estimates stats
+Sport2016_8RG_EstimatesStats_Formatted <- sapply(Sport2016_8RG_EstimatesStats_Final, function(yr) {
+  matrix(data = yr[, 1:5], nrow = 8, ncol = 5, dimnames = list(GroupNames8Pub, c("Mean", "SD", "Median", "5%", "95%")))
+}, simplify = FALSE)
+
+Sport2016PubNames <- setNames(object = SportMixPub2016, nm = names(Sport2016_8RG_EstimatesStats_Formatted))
+dput(x = Sport2016PubNames, file = "Objects/Sport2016PubNames.txt")
+
+SEAK2016Mixtures <- list.files(path = "BAYES/Mixture", full.names = FALSE)
+SEAK2016Mixtures_SampSizes <- sapply(SEAK2016Mixtures, function(mix) {dim(read.table(file = paste0("BAYES/Mixture/", mix)))[1]} )
+names(SEAK2016Mixtures_SampSizes) <- sapply(names(SEAK2016Mixtures_SampSizes), function(mix) {unlist(strsplit(x = mix, split = ".mix"))[1]})
+
+Sport2016MixNames <- setNames(object = list(SportMix2016[1],
+                                            SportMix2016[2],
+                                            SportMix2016[3],
+                                            SportMix2016[4:5],
+                                            SportMix2016[4],
+                                            SportMix2016[5]),
+                              nm = names(Sport2016_8RG_EstimatesStats_Formatted))
+dput(x = Sport2016MixNames, file = "Objects/Sport2016MixNames.txt")
+
+
+Sport2016_SampleSizes <- sapply(Sport2016MixNames, function(mix) {sum(SEAK2016Mixtures_SampSizes[mix])} )
+
+# Create fully formatted spreadsheat
+EstimatesStats <- Sport2016_8RG_EstimatesStats_Formatted
+SampSizes <- Sport2016_SampleSizes
+
+# dir.create("Estimates tables")
+
+for(mix in names(EstimatesStats)) {
+  
+  TableX <- matrix(data = "", nrow = 11, ncol = 7)
+  TableX[1, 3] <- paste(Sport2016PubNames[mix], "(n=", SampSizes[mix], ")")
+  TableX[2, 6] <- "90% CI"
+  TableX[3, 2:7] <- c("Reporting Group", colnames(EstimatesStats[[mix]]))
+  TableX[4:11, 1] <- 1:8
+  TableX[4:11, 2] <- rownames(EstimatesStats[[mix]])
+  TableX[4:11, 3:7] <- formatC(x = EstimatesStats[[mix]], digits = 3, format = "f")
+  
+  write.xlsx(x = TableX, file = "Estimates tables/Sport2016_8RG_StratifiedEstimatesStats_FormattedPretty.xlsx",
+             col.names = FALSE, row.names = FALSE, sheetName = paste(mix, " Sport 8 Driver"), append = TRUE)
+  
+}
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Resummarize 2016 Sport Stratified Estimates to 18 RGs ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Define RGs
+GroupVec33RG_to18RG
+
+### Unstratified
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 18RGs
+Sport2016_18RG_EstimatesStats <- 
+  CustomCombineBAYESOutput.GCL(groupvec = GroupVec33RG_to18RG, groupnames = GroupNames18,
+                               maindir = "BAYES/Output/33RG", 
+                               mixvec = SportMix2016, prior = "",
+                               ext = "RGN", nchains = 5, burn = 0.5, alpha = 0.1, PosteriorOutput = FALSE)
+
+any(sapply(Sport2016_18RG_EstimatesStats, function(mix) {any(mix[, "GR"] > 1.2)}))
+sapply(Sport2016_18RG_EstimatesStats, function(mix) {any(mix[, "GR"] > 1.2)})  # convergence issues with PBGWRN
+Sport2016_18RG_EstimatesStats$PBGWRNSport_2016[, "GR"]  # between SEAK/TBR and NCBC, digging through 33RG raw output this is an issue between SSEAK and Skeena
+# Sara went ahead and ran it out to 80K, but didn't converge, so she went ahead and averaged all 5 chains
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Dput files
+# dir.create("Estimates objects")
+# Grab estimates objects and dput in "Estimates objects"
+objects2dput <- c("Sport2016_18RG_EstimatesStats")
+
+invisible(sapply(objects2dput, function(obj) {
+  dput(x = get(obj), file = paste0("Estimates objects/", obj, ".txt"))
+})); rm(objects2dput)
+
+
+
+### Stratified
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 18RGs
+Sport2016_18RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec33RG_to18RG, groupnames = GroupNames18,
+                          maindir="BAYES/Output/33RG",
+                          mixvec = SportMix2016[4:5], catchvec = c(41119, 14590), 
+                          newname = "StratifiedOutSport2016_90percentCI_18RG", priorname = "", nchains = 5)  # got harvest numbers from "V:\Analysis\1_SEAK\Chinook\Mixture\SEAK16\Sport Estimates 2016.xlsx" tab "Summary"
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Dput files
+# Grab estimates objects and dput in "Estimates objects"
+objects2dput <- c("Sport2016_18RG_StratifiedEstimatesStats")
+
+invisible(sapply(objects2dput, function(obj) {
+  dput(x = get(obj)$Stats, file = paste0("Estimates objects/", obj, ".txt"))
+})); rm(objects2dput)
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Create 2016 summary tables ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## Get objects
+SEAK16estimatesobjects <- list.files(path = "Estimates objects", recursive = FALSE, pattern = "Sport2016_18RG")
+SEAK16estimatesobjects
+
+invisible(sapply(SEAK16estimatesobjects, function(objct) {assign(x = unlist(strsplit(x = objct, split = ".txt")), value = dget(file = paste(getwd(), "Estimates objects", objct, sep = "/")), pos = 1) })); beep(2)
+
+
+# Dget all estimates stats
+SEAK16estimatesobjects <- unlist(lapply(SEAK16estimatesobjects, function(objct) {unlist(strsplit(x = objct, split = ".txt"))}))
+
+Sport2016_18RG_EstimatesStats_Final <- c(
+  Sport2016_18RG_EstimatesStats[1:3],
+  list("OutSport_2016" = Sport2016_18RG_StratifiedEstimatesStats),
+  Sport2016_18RG_EstimatesStats[4:5]
+)
+dput(x = Sport2016_18RG_EstimatesStats_Final, file = "Estimates objects/Sport2016_18RG_EstimatesStats_Final.txt")
+
+# Check GR
+any(sapply(Sport2016_18RG_EstimatesStats_Final, function(mix) {any(mix[, "GR"] > 1.2)}))
+sapply(Sport2016_18RG_EstimatesStats_Final, function(mix) {any(mix[, "GR"] > 1.2)})  # Known PBGWRN issue
+
+
+# Reformat estimates stats
+Sport2016_18RG_EstimatesStats_Formatted <- sapply(Sport2016_18RG_EstimatesStats_Final, function(yr) {
+  matrix(data = yr[, 1:5], nrow = 18, ncol = 5, dimnames = list(GroupNames18Pub, c("Mean", "SD", "Median", "5%", "95%")))
+}, simplify = FALSE)
+
+# Sport2016PubNames <- setNames(object = SportMixPub2016, nm = names(Sport2016_18RG_EstimatesStats_Formatted))
+# dput(x = Sport2016PubNames, file = "Objects/Sport2016PubNames.txt")
+
+SEAK2016Mixtures <- list.files(path = "BAYES/Mixture", full.names = FALSE)
+SEAK2016Mixtures_SampSizes <- sapply(SEAK2016Mixtures, function(mix) {dim(read.table(file = paste0("BAYES/Mixture/", mix)))[1]} )
+names(SEAK2016Mixtures_SampSizes) <- sapply(names(SEAK2016Mixtures_SampSizes), function(mix) {unlist(strsplit(x = mix, split = ".mix"))[1]})
+
+Sport2016MixNames <- setNames(object = list(SportMix2016[1],
+                                            SportMix2016[2],
+                                            SportMix2016[3],
+                                            SportMix2016[4:5],
+                                            SportMix2016[4],
+                                            SportMix2016[5]),
+                              nm = names(Sport2016_18RG_EstimatesStats_Formatted))
+dput(x = Sport2016MixNames, file = "Objects/Sport2016MixNames.txt")
+
+
+Sport2016_SampleSizes <- sapply(Sport2016MixNames, function(mix) {sum(SEAK2016Mixtures_SampSizes[mix])} )
+dput(x = Sport2016_SampleSizes, file = "Objects/Sport2016_SampleSizes.txt")
+
+# Create fully formatted spreadsheat
+EstimatesStats <- Sport2016_18RG_EstimatesStats_Formatted
+SampSizes <- Sport2016_SampleSizes
+
+# dir.create("Estimates tables")
+
+for(mix in names(EstimatesStats)) {
+  
+  TableX <- matrix(data = "", nrow = 21, ncol = 7)
+  TableX[1, 3] <- paste(Sport2016PubNames[mix], "(n=", SampSizes[mix], ")")
+  TableX[2, 6] <- "90% CI"
+  TableX[3, 2:7] <- c("Reporting Group", colnames(EstimatesStats[[mix]]))
+  TableX[4:21, 1] <- 1:18
+  TableX[4:21, 2] <- rownames(EstimatesStats[[mix]])
+  TableX[4:21, 3:7] <- formatC(x = EstimatesStats[[mix]], digits = 3, format = "f")
+  
+  write.xlsx(x = TableX, file = "Estimates tables/Sport2016_18RG_StratifiedEstimatesStats_FormattedPretty.xlsx",
+             col.names = FALSE, row.names = FALSE, sheetName = paste(mix, " Sport 18RG"), append = TRUE)
+  
+}
+
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Resummarize 2016 Sport Stratified Estimates to 4 RGs ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Define RGs
+GroupVec33RG_to4RG
+
+### Unstratified
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 4RGs
+Sport2016_4RG_EstimatesStats <- 
+  CustomCombineBAYESOutput.GCL(groupvec = GroupVec33RG_to4RG, groupnames = GroupNames4,
+                               maindir = "BAYES/Output/33RG", 
+                               mixvec = SportMix2016, prior = "",
+                               ext = "RGN", nchains = 5, burn = 0.5, alpha = 0.1, PosteriorOutput = FALSE)
+
+any(sapply(Sport2016_4RG_EstimatesStats, function(mix) {any(mix[, "GR"] > 1.2)}))
+sapply(Sport2016_4RG_EstimatesStats, function(mix) {any(mix[, "GR"] > 1.2)})  # convergence issues with PBGWRN
+Sport2016_4RG_EstimatesStats$PBGWRNSport_2016[, "GR"]  # between SEAK/TBR and NCBC, digging through 33RG raw output this is an issue between SSEAK and Skeena
+# Sara went ahead and ran it out to 80K, but didn't converge, so she went ahead and averaged all 5 chains
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Dput files
+# dir.create("Estimates objects")
+# Grab estimates objects and dput in "Estimates objects"
+objects2dput <- c("Sport2016_4RG_EstimatesStats")
+
+invisible(sapply(objects2dput, function(obj) {
+  dput(x = get(obj), file = paste0("Estimates objects/", obj, ".txt"))
+})); rm(objects2dput)
+
+
+
+### Stratified
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 4RGs
+Sport2016_4RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec33RG_to4RG, groupnames = GroupNames4,
+                          maindir="BAYES/Output/33RG",
+                          mixvec = SportMix2016[4:5], catchvec = c(41119, 14590), 
+                          newname = "StratifiedOutSport2016_90percentCI_4RG", priorname = "", nchains = 5)  # got harvest numbers from "V:\Analysis\1_SEAK\Chinook\Mixture\SEAK16\Sport Estimates 2016.xlsx" tab "Summary"
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Dput files
+# Grab estimates objects and dput in "Estimates objects"
+objects2dput <- c("Sport2016_4RG_StratifiedEstimatesStats")
+
+invisible(sapply(objects2dput, function(obj) {
+  dput(x = get(obj)$Stats, file = paste0("Estimates objects/", obj, ".txt"))
+})); rm(objects2dput)
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Create 2016 summary tables ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## Get objects
+SEAK16estimatesobjects <- list.files(path = "Estimates objects", recursive = FALSE, pattern = "Sport2016_4RG")
+SEAK16estimatesobjects
+
+invisible(sapply(SEAK16estimatesobjects, function(objct) {assign(x = unlist(strsplit(x = objct, split = ".txt")), value = dget(file = paste(getwd(), "Estimates objects", objct, sep = "/")), pos = 1) })); beep(2)
+
+
+# Dget all estimates stats
+SEAK16estimatesobjects <- unlist(lapply(SEAK16estimatesobjects, function(objct) {unlist(strsplit(x = objct, split = ".txt"))}))
+
+Sport2016_4RG_EstimatesStats_Final <- c(
+  Sport2016_4RG_EstimatesStats[1:3],
+  list("OutSport_2016" = Sport2016_4RG_StratifiedEstimatesStats),
+  Sport2016_4RG_EstimatesStats[4:5]
+)
+dput(x = Sport2016_4RG_EstimatesStats_Final, file = "Estimates objects/Sport2016_4RG_EstimatesStats_Final.txt")
+
+# Check GR
+any(sapply(Sport2016_4RG_EstimatesStats_Final, function(mix) {any(mix[, "GR"] > 1.2)}))
+sapply(Sport2016_4RG_EstimatesStats_Final, function(mix) {any(mix[, "GR"] > 1.2)})  # Known PBGWRN issue
+
+
+# Reformat estimates stats
+Sport2016_4RG_EstimatesStats_Formatted <- sapply(Sport2016_4RG_EstimatesStats_Final, function(yr) {
+  matrix(data = yr[, 1:5], nrow = 4, ncol = 5, dimnames = list(GroupNames4Pub, c("Mean", "SD", "Median", "5%", "95%")))
+}, simplify = FALSE)
+
+# Sport2016PubNames <- setNames(object = SportMixPub2016, nm = names(Sport2016_4RG_EstimatesStats_Formatted))
+# dput(x = Sport2016PubNames, file = "Objects/Sport2016PubNames.txt")
+
+SEAK2016Mixtures <- list.files(path = "BAYES/Mixture", full.names = FALSE)
+SEAK2016Mixtures_SampSizes <- sapply(SEAK2016Mixtures, function(mix) {dim(read.table(file = paste0("BAYES/Mixture/", mix)))[1]} )
+names(SEAK2016Mixtures_SampSizes) <- sapply(names(SEAK2016Mixtures_SampSizes), function(mix) {unlist(strsplit(x = mix, split = ".mix"))[1]})
+
+Sport2016MixNames <- setNames(object = list(SportMix2016[1],
+                                            SportMix2016[2],
+                                            SportMix2016[3],
+                                            SportMix2016[4:5],
+                                            SportMix2016[4],
+                                            SportMix2016[5]),
+                              nm = names(Sport2016_4RG_EstimatesStats_Formatted))
+dput(x = Sport2016MixNames, file = "Objects/Sport2016MixNames.txt")
+
+
+Sport2016_SampleSizes <- sapply(Sport2016MixNames, function(mix) {sum(SEAK2016Mixtures_SampSizes[mix])} )
+dput(x = Sport2016_SampleSizes, file = "Objects/Sport2016_SampleSizes.txt")
+
+# Create fully formatted spreadsheat
+EstimatesStats <- Sport2016_4RG_EstimatesStats_Formatted
+SampSizes <- Sport2016_SampleSizes
+
+# dir.create("Estimates tables")
+
+for(mix in names(EstimatesStats)) {
+  
+  TableX <- matrix(data = "", nrow = 7, ncol = 7)
+  TableX[1, 3] <- paste(Sport2016PubNames[mix], "(n=", SampSizes[mix], ")")
+  TableX[2, 6] <- "90% CI"
+  TableX[3, 2:7] <- c("Reporting Group", colnames(EstimatesStats[[mix]]))
+  TableX[4:7, 1] <- 1:4
+  TableX[4:7, 2] <- rownames(EstimatesStats[[mix]])
+  TableX[4:7, 3:7] <- formatC(x = EstimatesStats[[mix]], digits = 3, format = "f")
+  
+  write.xlsx(x = TableX, file = "Estimates tables/Sport2016_4RG_StratifiedEstimatesStats_FormattedPretty.xlsx",
+             col.names = FALSE, row.names = FALSE, sheetName = paste(mix, " Sport 4RG"), append = TRUE)
+  
+}
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Create 2016 Sport HeatMaps ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# dir.create("Figures")
+
+# Create layout
+layoutmat <- matrix(c(9,1,2,11,
+                      9,3,4,11,
+                      9,5,6,11,
+                      9,7,8,11,
+                      12,10,10,13), ncol=4,nrow=5,byrow=T)
+SEAKTrollLayout <- layout(layoutmat,widths=c(0.25,1,1,0.25),heights=c(1,1,1,1,0.25))
+layout.show(SEAKTrollLayout)
+
+# Set color ramp
+library('lattice')
+WhiteRedColPalette <- colorRampPalette(colors=c("white","red"))
+WhiteRedcol <- level.colors(x=seq(from=0,to=1,by=0.01), at = seq(from=0,to=1,by=0.01), col.regions = WhiteRedColPalette(100))
+
+# Mixture names
+mixnames <- names(EstimatesStats)[-6]
+
+# Create list object with by RG stock comps
+HeatmapEstimates <- sapply(GroupNames8Pub, function(RG) {
+  matrix(data = sapply(mixnames, function(mix) {EstimatesStats[[mix]][RG, "Mean"] }),
+         nrow = 2, ncol = 5, dimnames = list(c("NO", "AllQuad"), c("EWint", "LWint", "Spring", "SumRet1", "SumRet2"))
+  )
+}, simplify = FALSE)
+zmax <- max(sapply(HeatmapEstimates, max))
+
+Testing <- matrix(c(seq(from = 0, to = zmax, length.out = 102), seq(from = 0, to = zmax, length.out = 102)), nrow = 2, ncol = 102, byrow = T)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## Plot: Can't do a nested layout, writing out as pdf then pasting in other pdf
+
+# pdf("Figures/2016TrollByFisheryQuadrant.pdf", family = "Times", width = 6.5, height = 6.5, title = "2016 Troll By Fishery and Quadrant")
+png("Figures/2016TrollByFisheryQuadrant.png", family = "Times", width = 6.5, height = 6.5, units = "in", res = 300)
+# x11(width = 6.5, height = 6.5)
+par(xaxt = "n", yaxt = "n", omi = rep(0.1, 4), mar = rep(0.1, 4), family = 'serif')
+layout(layoutmat,widths=c(0.3,1,1,0.25),heights=c(1,1,1,1,0.4))
+
+## Loop through Reporting Group plots
+sapply(GroupNames8Pub, function(RG) {
+  image(t(HeatmapEstimates[[RG]])[, c("AllQuad", "NO")], zlim = c(0, zmax), col = WhiteRedcol, xlab = "", ylab = "", breaks = seq(from = 0, to = zmax, length.out = 102), useRaster = TRUE)
+  abline(h = 0.5, lwd = 2, col = 'grey')
+  abline(v = c(0.135, 0.38, 0.63, 0.875), lwd= 2 , col = 'grey')
+  abline(h = c(-0.5, 1.5), v = c(-0.125, 1.125),lwd = 5, col = 'black')
+  text(labels = RG, cex = 2, adj = c(0, 0.5), x = -0.1, y = 1)
+})
+
+## Plot 10 - Y-axis label
+plot.new()
+text(labels = "Quadrant", cex = 3, srt = 90, x = 0.3, y = 0.5, adj = c(0.5, 0))
+text(labels = "NO", cex = 2, x = 0.99, y = c(0.97, 0.7, 0.43, 0.16), adj = c(1, 0.5))
+text(labels = "All", cex = 2, x = 0.99, y = c(0.97, 0.7, 0.43, 0.16) - 0.135, adj = c(1, 0.5))
+
+## Plot 11 - X-axis label
+plot.new()
+text(labels = "Fishery", cex = 3, adj = c(0.5, 0.5), x = 0.5, y = 0.35)
+text(labels = "EW", cex = 2, adj = c(0.5, 0.5), x = c(0.02, 0.56), y = 0.8)
+text(labels = "LW", cex = 2, adj = c(0.5, 0.5), x = c(0.02 + 0.115, 0.56 + 0.115), y = 0.8)
+text(labels = "SP", cex = 2, adj = c(0.5, 0.5), x = c(0.02 + 0.22, 0.56 + 0.22), y = 0.8)
+text(labels = "SU1", cex = 2, adj = c(0.5, 0.5), x = c(0.02 + 0.33, 0.56 + 0.33), y = 0.8)
+text(labels = "SU2", cex = 2, adj = c(0.5, 0.5), x = c(0.02 + 0.43, 0.56 + 0.43), y = 0.8)
+
+## Plot 13 - Legend
+image(Testing, col = WhiteRedcol, xlab = "", ylab = "", breaks = seq(from = 0, to = zmax, length.out = 102))
+text(labels = "0%", cex = 2.8, adj = c(0.5, 0.5), x = 0.5, y = 0.03)
+text(labels = "50%", cex = 2.8, adj = c(0.5, 0.5), x = 0.5, y = 0.98)
+abline(h = c(-0.005,  1.005),  v  =  c(-0.5,  1.5), lwd = 5, col = 'black')
+dev.off()
+dev.off()
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
