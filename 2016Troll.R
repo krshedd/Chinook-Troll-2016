@@ -1341,56 +1341,419 @@ WhiteRedColPalette <- colorRampPalette(colors=c("white","red"))
 WhiteRedcol <- level.colors(x=seq(from=0,to=1,by=0.01), at = seq(from=0,to=1,by=0.01), col.regions = WhiteRedColPalette(100))
 
 # Mixture names
-mixnames <- names(EstimatesStats)[-6]
+mixnames <- c(rep(x = names(EstimatesStats)[1:3], each = 2), names(EstimatesStats)[5:6])
 
 # Create list object with by RG stock comps
 HeatmapEstimates <- sapply(GroupNames8Pub, function(RG) {
   matrix(data = sapply(mixnames, function(mix) {EstimatesStats[[mix]][RG, "Mean"] }),
-         nrow = 2, ncol = 5, dimnames = list(c("NO", "AllQuad"), c("EWint", "LWint", "Spring", "SumRet1", "SumRet2"))
+         nrow = 2, ncol = 4, dimnames = list(c("Early", "Late"), c("KTN", "PBGWRN", "Inside", "Outside"))
   )
 }, simplify = FALSE)
 zmax <- max(sapply(HeatmapEstimates, max))
+zmax <- 0.85
 
 Testing <- matrix(c(seq(from = 0, to = zmax, length.out = 102), seq(from = 0, to = zmax, length.out = 102)), nrow = 2, ncol = 102, byrow = T)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ## Plot: Can't do a nested layout, writing out as pdf then pasting in other pdf
 
-# pdf("Figures/2016TrollByFisheryQuadrant.pdf", family = "Times", width = 6.5, height = 6.5, title = "2016 Troll By Fishery and Quadrant")
-png("Figures/2016TrollByFisheryQuadrant.png", family = "Times", width = 6.5, height = 6.5, units = "in", res = 300)
+# pdf("Figures/2016SportByFishery.pdf", family = "Times", width = 6.5, height = 6.5, title = "2016 Troll By Fishery and Quadrant")
+png("Figures/2016SportByFishery.png", family = "Times", width = 6.5, height = 6.5, units = "in", res = 300)
 # x11(width = 6.5, height = 6.5)
 par(xaxt = "n", yaxt = "n", omi = rep(0.1, 4), mar = rep(0.1, 4), family = 'serif')
 layout(layoutmat,widths=c(0.3,1,1,0.25),heights=c(1,1,1,1,0.4))
 
 ## Loop through Reporting Group plots
 sapply(GroupNames8Pub, function(RG) {
-  image(t(HeatmapEstimates[[RG]])[, c("AllQuad", "NO")], zlim = c(0, zmax), col = WhiteRedcol, xlab = "", ylab = "", breaks = seq(from = 0, to = zmax, length.out = 102), useRaster = TRUE)
-  abline(h = 0.5, lwd = 2, col = 'grey')
-  abline(v = c(0.135, 0.38, 0.63, 0.875), lwd= 2 , col = 'grey')
-  abline(h = c(-0.5, 1.5), v = c(-0.125, 1.125),lwd = 5, col = 'black')
+  image(t(HeatmapEstimates[[RG]])[, ], zlim = c(0, zmax), col = WhiteRedcol, xlab = "", ylab = "", breaks = seq(from = 0, to = zmax, length.out = 102), useRaster = TRUE)
+  # abline(h = 0.5, lwd = 2, col = 'grey')
+  segments(x0 = 0.835, x1 = 1.165, y0 = 0.5, y1 = 0.5, lwd = 2, col = 'grey')
+  abline(v = c(0.175, 0.5, 0.835), lwd= 2 , col = 'grey')
+  abline(h = c(-0.5, 1.5), v = c(-0.165, 1.165),lwd = 5, col = 'black')
   text(labels = RG, cex = 2, adj = c(0, 0.5), x = -0.1, y = 1)
 })
 
 ## Plot 10 - Y-axis label
 plot.new()
-text(labels = "Quadrant", cex = 3, srt = 90, x = 0.3, y = 0.5, adj = c(0.5, 0))
-text(labels = "NO", cex = 2, x = 0.99, y = c(0.97, 0.7, 0.43, 0.16), adj = c(1, 0.5))
-text(labels = "All", cex = 2, x = 0.99, y = c(0.97, 0.7, 0.43, 0.16) - 0.135, adj = c(1, 0.5))
+text(labels = "Period", cex = 3, srt = 90, x = 0.3, y = 0.5, adj = c(0.5, 0))
+text(labels = "Early", cex = 2, x = 0.99, y = c(0.97, 0.7, 0.43, 0.16), adj = c(1, 0.5))
+text(labels = "Late", cex = 2, x = 0.99, y = c(0.97, 0.7, 0.43, 0.16) - 0.135, adj = c(1, 0.5))
 
 ## Plot 11 - X-axis label
 plot.new()
 text(labels = "Fishery", cex = 3, adj = c(0.5, 0.5), x = 0.5, y = 0.35)
-text(labels = "EW", cex = 2, adj = c(0.5, 0.5), x = c(0.02, 0.56), y = 0.8)
-text(labels = "LW", cex = 2, adj = c(0.5, 0.5), x = c(0.02 + 0.115, 0.56 + 0.115), y = 0.8)
-text(labels = "SP", cex = 2, adj = c(0.5, 0.5), x = c(0.02 + 0.22, 0.56 + 0.22), y = 0.8)
-text(labels = "SU1", cex = 2, adj = c(0.5, 0.5), x = c(0.02 + 0.33, 0.56 + 0.33), y = 0.8)
-text(labels = "SU2", cex = 2, adj = c(0.5, 0.5), x = c(0.02 + 0.43, 0.56 + 0.43), y = 0.8)
+text(labels = "KTN", cex = 1.5, adj = c(0.5, 0.5), x = c(0.03, 0.57), y = 0.8)
+text(labels = "PBGWRN", cex = 1.5, adj = c(0.5, 0.5), x = c(0.03 + 0.14, 0.57 + 0.14), y = 0.8)
+text(labels = "Inside", cex = 1.5, adj = c(0.5, 0.5), x = c(0.03 + 0.27, 0.57 + 0.27), y = 0.8)
+text(labels = "Outside", cex = 1.5, adj = c(0.5, 0.5), x = c(0.03 + 0.40, 0.57 + 0.40), y = 0.8)
 
 ## Plot 13 - Legend
 image(Testing, col = WhiteRedcol, xlab = "", ylab = "", breaks = seq(from = 0, to = zmax, length.out = 102))
 text(labels = "0%", cex = 2.8, adj = c(0.5, 0.5), x = 0.5, y = 0.03)
-text(labels = "50%", cex = 2.8, adj = c(0.5, 0.5), x = 0.5, y = 0.98)
+text(labels = paste0(zmax * 100, "%"), cex = 2.8, adj = c(0.5, 0.5), x = 0.5, y = 0.98)
 abline(h = c(-0.005,  1.005),  v  =  c(-0.5,  1.5), lwd = 5, col = 'black')
 dev.off()
 dev.off()
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Building a Sport Harvest Matrix ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+SportHarvest2009to2016.mat <- matrix(data = NA, nrow = 5, ncol = 8, dimnames = list(c("KTN", "PBGWRN", "Inside", "OutSportPer1", "OutSportPer2"), 2009:2016))
+
+# Grabbing Sport Harvest Estimates by Mixture from <V:\Analysis\1_SEAK\Chinook\Mixture\SEAKChinookSummary_2004-2016.xlsx>
+SportHarvest2009to2016.mat["KTN", as.character(2009:2015)] <- as.numeric(gsub(pattern = ",", replacement = "", x = strsplit(x = readClipboard(), split = "\t")[[1]][seq(from = 3, by = 4, length.out = 7)]))
+SportHarvest2009to2016.mat["PBGWRN", as.character(2009:2015)] <- as.numeric(gsub(pattern = ",", replacement = "", x = strsplit(x = readClipboard(), split = "\t")[[1]][seq(from = 3, by = 4, length.out = 7)]))
+SportHarvest2009to2016.mat["Inside", as.character(2009:2015)] <- as.numeric(gsub(pattern = ",", replacement = "", x = strsplit(x = readClipboard(), split = "\t")[[1]][seq(from = 3, by = 4, length.out = 7)]))
+SportHarvest2009to2016.mat["OutSportPer1", as.character(2009:2015)] <- as.numeric(gsub(pattern = ",", replacement = "", x = strsplit(x = readClipboard(), split = "\t")[[1]][seq(from = 3, by = 4, length.out = 7)]))
+SportHarvest2009to2016.mat["OutSportPer2", as.character(2009:2015)] <- as.numeric(gsub(pattern = ",", replacement = "", x = strsplit(x = readClipboard(), split = "\t")[[1]][seq(from = 3, by = 4, length.out = 7)]))
+
+# Note that the OutSportPer1 and 2 harvest estimates say they are from "preliminary data"
+# Note that 2016 harvest estimates are preliminary
+
+# Filling in 2016 Harvest with Preliminary Harvest Data from <V:\Analysis\1_SEAK\Chinook\Mixture\SEAK16\Sport Estimates 2016.xlsx>, "Summary" tab
+# 2016 "Inside" is only Juneau harvest!!!
+SportHarvest2009to2016.mat["KTN", "2016"] <- as.numeric(gsub(pattern = ",", replacement = "", x = readClipboard()))
+SportHarvest2009to2016.mat["PBGWRN", "2016"] <- as.numeric(gsub(pattern = ",", replacement = "", x = readClipboard()))
+SportHarvest2009to2016.mat["Inside", "2016"] <- as.numeric(gsub(pattern = ",", replacement = "", x = readClipboard()))
+SportHarvest2009to2016.mat["OutSportPer1", "2016"] <- as.numeric(gsub(pattern = ",", replacement = "", x = readClipboard()))
+SportHarvest2009to2016.mat["OutSportPer2", "2016"] <- as.numeric(gsub(pattern = ",", replacement = "", x = readClipboard()))
+
+dput(x = SportHarvest2009to2016.mat, file = "Objects/SportHarvest2009to2016.mat.txt")
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### 2016 8RG Sport Driver Stock Resummarization ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK16")
+
+paste(SportMix2016, collapse = ", ")
+
+AllYearSport2016_8RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec33RG_to8RG, groupnames = GroupNames8,
+                          maindir="BAYES/Output/33RG",
+                          mixvec = c("KTNSport_2016", "PBGWRNSport_2016", "InsideSport_2016", "OutSportPer1_2016", "OutSportPer2_2016"),
+                          catchvec = SportHarvest2009to2016.mat[, "2016"], 
+                          newname = "StratifiedAllYearSport2016_90percentCI_8RG", priorname = "", nchains = 5)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Dput files
+# dir.create("Estimates objects")
+# Grab estimates objects and dput in "Estimates objects"
+objects2dput <- c("AllYearSport2016_8RG_StratifiedEstimatesStats")
+
+invisible(sapply(objects2dput, function(obj) {
+  dput(x = get(obj)$Stats, file = paste0("Estimates objects/", obj, ".txt"))
+  # dput(x = get(obj)$Stats, file = paste0("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK16/Estimates objects/", obj, ".txt"))
+})); rm(objects2dput)
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### 2015 8RG Sport Driver Stock Resummarization ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK15")
+
+# Note that PBGWRN did NOT converge, so Sara used only 3 chains (1-3)
+# I used all 5 chains to get the function to work, the PBGWRN harvest share is small anyways...
+
+AllYearSport2015_8RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec8, groupnames = GroupNames8,
+                          maindir="BAYES/Output",
+                          mixvec = c("KTNSport_2015", "PBGWRNSport_2015", "NISport_2015", "OutSport_thruBW13_2015", "OutSport_afterBW13_2015"),
+                          catchvec = SportHarvest2009to2016.mat[, "2015"], 
+                          newname = "StratifiedAllYearSport2015_90percentCI_8RG", priorname = "", nchains = 5)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Dput files
+# dir.create("Estimates objects")
+# Grab estimates objects and dput in "Estimates objects"
+objects2dput <- c("AllYearSport2015_8RG_StratifiedEstimatesStats")
+
+invisible(sapply(objects2dput, function(obj) {
+  dput(x = get(obj)$Stats, file = paste0("Estimates objects/", obj, ".txt"))
+  dput(x = get(obj)$Stats, file = paste0("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK16/Estimates objects/", obj, ".txt"))
+})); rm(objects2dput)
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### 2014 8RG Sport Driver Stock Resummarization ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK14")
+
+# Need a new groupvec of length 27, not 26, because Chilkat was broken out of NSEAK
+# Note that PBGWRN did NOT converge, so Sara used only 4 chains (1-4)
+# I used 4 chains for all, as I couldn't find the 5th RGN for PBGWRN
+
+AllYearSport2014_8RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = c(1, GroupVec8), groupnames = GroupNames8,
+                          maindir="BAYES/Output",
+                          mixvec = c("KTNSport.2014", "PBGWRNSport.2014", "NISport.2014", "OutPer1Sport.2014", "OutPer2Sport.2014"),
+                          catchvec = SportHarvest2009to2016.mat[, "2014"], 
+                          newname = "StratifiedAllYearSport2014_90percentCI_8RG", priorname = "", nchains = 4)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Dput files
+# dir.create("Estimates objects")
+# Grab estimates objects and dput in "Estimates objects"
+objects2dput <- c("AllYearSport2014_8RG_StratifiedEstimatesStats")
+
+invisible(sapply(objects2dput, function(obj) {
+  dput(x = get(obj)$Stats, file = paste0("Estimates objects/", obj, ".txt"))
+  dput(x = get(obj)$Stats, file = paste0("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK16/Estimates objects/", obj, ".txt"))
+})); rm(objects2dput)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### 2013 8RG Sport Driver Stock Resummarization ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK13")
+
+AllYearSport2013_8RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec8, groupnames = GroupNames8,
+                          maindir="BAYES/Output",
+                          mixvec = c("KTNSport.2013", "PBGWRNSport.2013", "NISport.2013", "OutPer1Sport.2013", "OutPer2Sport.2013"),
+                          catchvec = SportHarvest2009to2016.mat[, "2013"], 
+                          newname = "StratifiedAllYearSport2013_90percentCI_8RG", priorname = "", nchains = 5)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Dput files
+# dir.create("Estimates objects")
+# Grab estimates objects and dput in "Estimates objects"
+objects2dput <- c("AllYearSport2013_8RG_StratifiedEstimatesStats")
+
+invisible(sapply(objects2dput, function(obj) {
+  dput(x = get(obj)$Stats, file = paste0("Estimates objects/", obj, ".txt"))
+  dput(x = get(obj)$Stats, file = paste0("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK16/Estimates objects/", obj, ".txt"))
+})); rm(objects2dput)
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### 2012 8RG Sport Driver Stock Resummarization ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK12")
+
+AllYearSport2012_8RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec8, groupnames = GroupNames8,
+                          maindir="BAYES/Output",
+                          mixvec = c("KTNSport.2012", "PBGWRNSport.2012", "NISport.2012", "OutPer1Sport.2012", "OutPer2Sport.2012"),
+                          catchvec = SportHarvest2009to2016.mat[, "2012"], 
+                          newname = "StratifiedAllYearSport2012_90percentCI_8RG", priorname = "", nchains = 5)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Dput files
+# dir.create("Estimates objects")
+# Grab estimates objects and dput in "Estimates objects"
+objects2dput <- c("AllYearSport2012_8RG_StratifiedEstimatesStats")
+
+invisible(sapply(objects2dput, function(obj) {
+  dput(x = get(obj)$Stats, file = paste0("Estimates objects/", obj, ".txt"))
+  dput(x = get(obj)$Stats, file = paste0("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK16/Estimates objects/", obj, ".txt"))
+})); rm(objects2dput)
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### 2011 8RG Sport Driver Stock Resummarization ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK11")
+
+# Note that PBGWRN did NOT converge, so Sara used only 3 chains (2-4)
+# I used 3 chains for all, as I couldn't find the 5th RGN for PBGWRN
+
+AllYearSport2011_8RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec8, groupnames = GroupNames8,
+                          maindir="BAYES/Output",
+                          mixvec = c("KTNSport.2011", "PBGWRNSport.2011", "NISport.2011", "OutPer1Sport.2011", "OutPer2Sport.2011"),
+                          catchvec = SportHarvest2009to2016.mat[, "2011"], 
+                          newname = "StratifiedAllYearSport2011_90percentCI_8RG", priorname = "", nchains = 3)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Dput files
+# dir.create("Estimates objects")
+# Grab estimates objects and dput in "Estimates objects"
+objects2dput <- c("AllYearSport2011_8RG_StratifiedEstimatesStats")
+
+invisible(sapply(objects2dput, function(obj) {
+  dput(x = get(obj)$Stats, file = paste0("Estimates objects/", obj, ".txt"))
+  dput(x = get(obj)$Stats, file = paste0("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK16/Estimates objects/", obj, ".txt"))
+})); rm(objects2dput)
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### 2010 8RG Sport Driver Stock Resummarization ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK10")
+
+# Note that PBGWRN did NOT converge, so Sara used only 3 chains (2-4)
+# I used 3 chains for all, as I couldn't find the 5th RGN for PBGWRN
+
+AllYearSport2010_8RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec8, groupnames = GroupNames8,
+                          maindir="BAYES/Output",
+                          mixvec = c("KTNSport.2010", "PBGWRNSport.2010", "NISport.2010", "OutPer1Sport.2010", "OutPer2Sport.2010"),
+                          catchvec = SportHarvest2009to2016.mat[, "2010"], 
+                          newname = "StratifiedAllYearSport2010_90percentCI_8RG", priorname = "", nchains = 5)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Dput files
+# dir.create("Estimates objects")
+# Grab estimates objects and dput in "Estimates objects"
+objects2dput <- c("AllYearSport2010_8RG_StratifiedEstimatesStats")
+
+invisible(sapply(objects2dput, function(obj) {
+  dput(x = get(obj)$Stats, file = paste0("Estimates objects/", obj, ".txt"))
+  dput(x = get(obj)$Stats, file = paste0("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK16/Estimates objects/", obj, ".txt"))
+})); rm(objects2dput)
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### 2009 8RG Sport Driver Stock Resummarization ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK09")
+
+AllYearSport2009_8RG_StratifiedEstimatesStats <- 
+  StratifiedEstimator.GCL(groupvec = GroupVec8, groupnames = GroupNames8,
+                          maindir="BAYES/1_GAPS3.0/Output",
+                          mixvec = c("KTNSport.2009", "PBGWRNSport.2009", "NISport.2009", "OutPer1Sport.2009", "OutPer2Sport.2009"),
+                          catchvec = SportHarvest2009to2016.mat[, "2009"], 
+                          newname = "StratifiedAllYearSport2009_90percentCI_8RG", priorname = "", nchains = 5)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Dput files
+# dir.create("Estimates objects")
+# Grab estimates objects and dput in "Estimates objects"
+objects2dput <- c("AllYearSport2009_8RG_StratifiedEstimatesStats")
+
+invisible(sapply(objects2dput, function(obj) {
+  dput(x = get(obj)$Stats, file = paste0("Estimates objects/", obj, ".txt"))
+  dput(x = get(obj)$Stats, file = paste0("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK16/Estimates objects/", obj, ".txt"))
+})); rm(objects2dput)
+
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Building a Sport Samplesize Matrix ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+SportSampleSize2009to2016.mat <- matrix(data = NA, nrow = 5, ncol = 8, dimnames = list(c("KTN", "PBGWRN", "Inside", "OutSportPer1", "OutSportPer2"), 2009:2016))
+
+# 2009
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK09")
+SEAK2009Mixtures <- c("KTNSport.2009", "PBGWRNSport.2009", "NISport.2009", "OutPer1Sport.2009", "OutPer2Sport.2009")
+SportSampleSize2009to2016.mat[, "2009"] <- sapply(SEAK2009Mixtures, function(mix) {dim(read.table(file = paste0("BAYES/1_GAPS3.0/Mix/", mix, ".mix")))[1]} )
+
+# 2010
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK10")
+SEAK2010Mixtures <- c("KTNSport.2010", "PBGWRNSport.2010", "NISport.2010", "OutPer1Sport.2010", "OutPer2Sport.2010")
+SportSampleSize2009to2016.mat[, "2010"] <- sapply(SEAK2010Mixtures, function(mix) {dim(read.table(file = paste0("BAYES/Mix/", mix, ".mix")))[1]} )
+
+# 2011
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK11")
+SEAK2011Mixtures <- c("KTNSport.2011", "PBGWRNSport.2011", "NISport.2011", "OutPer1Sport.2011", "OutPer2Sport.2011")
+SportSampleSize2009to2016.mat[, "2011"] <- sapply(SEAK2011Mixtures, function(mix) {dim(read.table(file = paste0("BAYES/Mixture/", mix, ".mix")))[1]} )
+
+# 2012
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK12")
+SEAK2012Mixtures <- c("KTNSport.2012", "PBGWRNSport.2012", "NISport.2012", "OutPer1Sport.2012", "OutPer2Sport.2012")
+SportSampleSize2009to2016.mat[, "2012"] <- sapply(SEAK2012Mixtures, function(mix) {dim(read.table(file = paste0("BAYES/Mixture/", mix, ".mix")))[1]} )
+
+# 2013
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK13")
+SEAK2013Mixtures <- c("KTNSport.2013", "PBGWRNSport.2013", "NISport.2013", "OutPer1Sport.2013", "OutPer2Sport.2013")
+SportSampleSize2009to2016.mat[, "2013"] <- sapply(SEAK2013Mixtures, function(mix) {dim(read.table(file = paste0("BAYES/Mixture/", mix, ".mix")))[1]} )
+
+# 2014
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK14")
+SEAK2014Mixtures <- c("KTNSport.2014", "PBGWRNSport.2014", "NISport.2014", "OutPer1Sport.2014", "OutPer2Sport.2014")
+SportSampleSize2009to2016.mat[, "2014"] <- sapply(SEAK2014Mixtures, function(mix) {dim(read.table(file = paste0("BAYES/Mixture/", mix, ".mix")))[1]} )
+
+# 2015
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK15")
+SEAK2015Mixtures <- c("KTNSport_2015", "PBGWRNSport_2015", "NISport_2015", "OutSport_thruBW13_2015", "OutSport_afterBW13_2015")
+SportSampleSize2009to2016.mat[, "2015"] <- sapply(SEAK2015Mixtures, function(mix) {dim(read.table(file = paste0("BAYES/Mixture/", mix, ".mix")))[1]} )
+
+# 2016
+setwd("V:/Analysis/1_SEAK/Chinook/Mixture/SEAK16")
+SEAK2016Mixtures <- c("KTNSport_2016", "PBGWRNSport_2016", "InsideSport_2016", "OutSportPer1_2016", "OutSportPer2_2016")
+SportSampleSize2009to2016.mat[, "2016"] <- sapply(SEAK2016Mixtures, function(mix) {dim(read.table(file = paste0("BAYES/Mixture/", mix, ".mix")))[1]} )
+
+dput(x = SportSampleSize2009to2016.mat, file = "Objects/SportSampleSize2009to2016.mat.txt")
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Create Annual summary tables ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## Get objects
+SEAK16estimatesobjects <- list.files(path = "Estimates objects", recursive = FALSE, pattern = "AllYearSport")
+SEAK16estimatesobjects
+
+invisible(sapply(SEAK16estimatesobjects, function(objct) {assign(x = unlist(strsplit(x = objct, split = ".txt")), value = dget(file = paste(getwd(), "Estimates objects", objct, sep = "/")), pos = 1) })); beep(2)
+
+# Dget all estimates stats
+# dir.create("Estimates tables")
+SEAK16estimatesobjects <- sapply(SEAK16estimatesobjects, function(objct) {unlist(strsplit(x = objct, split = ".txt"))})
+
+AllYearSport2009_2016_8RG_StratifiedEstimatesStats <- setNames(object = sapply(SEAK16estimatesobjects, function(yr) {get(yr)}, simplify = FALSE), nm = 2009:2016)
+dput(x = AllYearSport2009_2016_8RG_StratifiedEstimatesStats, file = "Estimates objects/AllYearSport2009_2016_8RG_StratifiedEstimatesStats.txt")
+
+# Get publication names
+GroupNames8Pub
+
+# Reformat estimates stats
+AllYearSport2009_2016_8RG_StratifiedEstimatesStats_Formatted <- sapply(AllYearSport2009_2016_8RG_StratifiedEstimatesStats, function(yr) {
+  matrix(data = yr[, 1:5], nrow = 8, ncol = 5, dimnames = list(GroupNames8Pub, c("Mean", "SD", "Median", "5%", "95%")))
+}, simplify = FALSE)
+
+# Dump a quick spreadsheet
+require(xlsx)
+sapply(2009:2016, function(yr) {
+  write.xlsx(x = AllYearSport2009_2016_8RG_StratifiedEstimatesStats_Formatted[[paste0(yr)]], file = "Estimates tables/AllYearSport2009_2016_8RG_StratifiedEstimatesStats_Formatted.xlsx", col.names = TRUE, row.names = TRUE, sheetName = paste(yr, "Annual Sport 8 Driver"), append = TRUE)
+})
+
+# Get annual sample sizes
+AllYearSport2009_2016_SampleSizes <- colSums(SportSampleSize2009to2016.mat)
+dput(x = AllYearSport2009_2016_SampleSizes, file = "Objects/AllYearSport2009_2016_SampleSizes.txt")
+
+# Create fully formatted spreadsheat
+EstimatesStats <- AllYearSport2009_2016_8RG_StratifiedEstimatesStats_Formatted
+SampSizes <- AllYearSport2009_2016_SampleSizes
+
+for(yr in 2009:2016) {
+  
+  TableX <- matrix(data = "", nrow = 11, ncol = 7)
+  TableX[1, 3] <- paste0("AY ", yr, " All Quadrants (n=", SampSizes[paste0(yr)], ")")
+  TableX[2, 6] <- "90% CI"
+  TableX[3, 2:7] <- c("Reporting Group", colnames(EstimatesStats[[paste0(yr)]]))
+  TableX[4:11, 1] <- 1:8
+  TableX[4:11, 2] <- rownames(EstimatesStats[[paste0(yr)]])
+  TableX[4:11, 3:7] <- formatC(x = EstimatesStats[[paste0(yr)]], digits = 3, format = "f")
+  
+  write.xlsx(x = TableX, file = "Estimates tables/AllYearSport2009_2016_8RG_StratifiedEstimatesStats_FormattedPretty.xlsx",
+             col.names = FALSE, row.names = FALSE, sheetName = paste(yr, "Annual Sport 8 Driver"), append = TRUE)
+  
+}
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Sport Stack Barplots ####
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+require(gplots)
+AllYearSport2009_2016_Means <- sapply(AllYearSport2009_2016_8RG_StratifiedEstimatesStats_Formatted, function(yr) {yr[, "Mean"]})
+
+par(mar = c(5.1, 5.1, 3.1, 11.1))
+x <- barplot2(height = AllYearSport2009_2016_Means[rev(GroupNames8Pub), ] * 100, 
+              beside = FALSE, ylim = c(0, 100), 
+              xlab = "Year", ylab = "Percentage of Catch", main = "Annual Sport Stock Composition",
+              cex.lab = 1.5, cex.main = 2, cex.axis = 1.3)
+abline(h = 0)
+legend(x = max(x) + 0.1 * diff(range(x)), y = 100, legend = GroupNames8Pub, 
+       fill = rev(heat.colors(nrow(AllYearSport2009_2016_Means))), xpd = TRUE)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AllYearSport2009_2016_HarvestMeans <- AllYearSport2009_2016_Means %*% diag(colSums(SportHarvest2009to2016.mat))
+colnames(AllYearSport2009_2016_HarvestMeans) <- 2009:2016
+ymax <- max(colSums(AllYearSport2009_2016_HarvestMeans))
+par(mar = c(5.1, 5.1, 3.1, 11.1))
+x <- barplot2(height = AllYearSport2009_2016_HarvestMeans[rev(GroupNames8Pub), ], 
+              beside = FALSE, ylim = c(0, ymax), 
+              xlab = "Year", ylab = "Harvest", main = "Annual Sport Stock-Specific Harvest",
+              cex.lab = 1.5, cex.main = 2, cex.axis = 1.3)
+abline(h = 0)
+legend(x = max(x) + 0.1 * diff(range(x)), y = ymax, legend = GroupNames8Pub, 
+       fill = rev(heat.colors(nrow(AllYearSport2009_2016_Means))), xpd = TRUE)
