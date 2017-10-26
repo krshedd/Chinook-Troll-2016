@@ -353,11 +353,15 @@ HeatmapEstimates <- sapply(GroupNames8Pub, function(RG) {
   )
 }, simplify = FALSE)
 zmax <- max(sapply(HeatmapEstimates, max))
+zmax <- 0.85  # Standardize with Sport Heatmap
 
 Testing <- matrix(c(seq(from = 0, to = zmax, length.out = 102), seq(from = 0, to = zmax, length.out = 102)), nrow = 2, ncol = 102, byrow = T)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ## Plot: Can't do a nested layout, writing out as pdf then pasting in other pdf
+
+GroupNames8Pub2 <- c(GroupNames8Pub[1:2], "West Vancouver",GroupNames8Pub[4:8])
+names(GroupNames8Pub2) <- GroupNames8Pub
 
 # pdf("Figures/2016TrollByFisheryQuadrant.pdf", family = "Times", width = 6.5, height = 6.5, title = "2016 Troll By Fishery and Quadrant")
 png("Figures/2016TrollByFisheryQuadrant.png", family = "Times", width = 6.5, height = 6.5, units = "in", res = 300)
@@ -371,7 +375,7 @@ sapply(GroupNames8Pub, function(RG) {
   abline(h = 0.5, lwd = 2, col = 'grey')
   abline(v = c(0.135, 0.38, 0.63, 0.875), lwd= 2 , col = 'grey')
   abline(h = c(-0.5, 1.5), v = c(-0.125, 1.125),lwd = 5, col = 'black')
-  text(labels = RG, cex = 2, adj = c(0, 0.5), x = -0.1, y = 1)
+  text(labels = substitute(expr = italic(x), env = list(x = GroupNames8Pub2[RG])), cex = 2, adj = c(0, 0.5), x = -0.1, y = 1)
 })
 
 ## Plot 10 - Y-axis label
@@ -392,7 +396,7 @@ text(labels = "SU2", cex = 2, adj = c(0.5, 0.5), x = c(0.02 + 0.43, 0.56 + 0.43)
 ## Plot 13 - Legend
 image(Testing, col = WhiteRedcol, xlab = "", ylab = "", breaks = seq(from = 0, to = zmax, length.out = 102))
 text(labels = "0%", cex = 2.8, adj = c(0.5, 0.5), x = 0.5, y = 0.03)
-text(labels = "50%", cex = 2.8, adj = c(0.5, 0.5), x = 0.5, y = 0.98)
+text(labels = "85%", cex = 2.8, adj = c(0.5, 0.5), x = 0.5, y = 0.98)  # formerly 50%
 abline(h = c(-0.005,  1.005),  v  =  c(-0.5,  1.5), lwd = 5, col = 'black')
 dev.off()
 dev.off()
@@ -1357,8 +1361,11 @@ Testing <- matrix(c(seq(from = 0, to = zmax, length.out = 102), seq(from = 0, to
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ## Plot: Can't do a nested layout, writing out as pdf then pasting in other pdf
 
+GroupNames8Pub2 <- c(GroupNames8Pub[1:2], "West Vancouver",GroupNames8Pub[4:8])
+names(GroupNames8Pub2) <- GroupNames8Pub
+
 # pdf("Figures/2016SportByFishery.pdf", family = "Times", width = 6.5, height = 6.5, title = "2016 Troll By Fishery and Quadrant")
-png("Figures/2016SportByFishery.png", family = "Times", width = 6.5, height = 6.5, units = "in", res = 300)
+png("Figures/2016SportByArea.png", family = "Times", width = 6.5, height = 6.5, units = "in", res = 300)
 # x11(width = 6.5, height = 6.5)
 par(xaxt = "n", yaxt = "n", omi = rep(0.1, 4), mar = rep(0.1, 4), family = 'serif')
 layout(layoutmat,widths=c(0.3,1,1,0.25),heights=c(1,1,1,1,0.4))
@@ -1370,7 +1377,7 @@ sapply(GroupNames8Pub, function(RG) {
   segments(x0 = 0.835, x1 = 1.165, y0 = 0.5, y1 = 0.5, lwd = 2, col = 'grey')
   abline(v = c(0.175, 0.5, 0.835), lwd= 2 , col = 'grey')
   abline(h = c(-0.5, 1.5), v = c(-0.165, 1.165),lwd = 5, col = 'black')
-  text(labels = RG, cex = 2, adj = c(0, 0.5), x = -0.1, y = 1)
+  text(labels = substitute(expr = italic(x), env = list(x = GroupNames8Pub2[RG])), cex = 2, adj = c(0, 0.5), x = -0.1, y = 1)
 })
 
 ## Plot 10 - Y-axis label
@@ -1381,9 +1388,9 @@ text(labels = "Late", cex = 2, x = 0.99, y = c(0.97, 0.7, 0.43, 0.16) - 0.135, a
 
 ## Plot 11 - X-axis label
 plot.new()
-text(labels = "Fishery", cex = 3, adj = c(0.5, 0.5), x = 0.5, y = 0.35)
+text(labels = "Area", cex = 3, adj = c(0.5, 0.5), x = 0.5, y = 0.35)
 text(labels = "KTN", cex = 1.5, adj = c(0.5, 0.5), x = c(0.03, 0.57), y = 0.8)
-text(labels = "PBGWRN", cex = 1.5, adj = c(0.5, 0.5), x = c(0.03 + 0.14, 0.57 + 0.14), y = 0.8)
+text(labels = "PB-WR", cex = 1.5, adj = c(0.5, 0.5), x = c(0.03 + 0.14, 0.57 + 0.14), y = 0.8)
 text(labels = "Inside", cex = 1.5, adj = c(0.5, 0.5), x = c(0.03 + 0.27, 0.57 + 0.27), y = 0.8)
 text(labels = "Outside", cex = 1.5, adj = c(0.5, 0.5), x = c(0.03 + 0.40, 0.57 + 0.40), y = 0.8)
 
